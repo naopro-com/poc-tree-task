@@ -1,14 +1,14 @@
 ﻿@using TreeTask.Models
 
 <div class="tree-node @(IsRootNode ? "tree-root" : "")">
-    <div class="tree-node-content @(IsActive ? "active" : "")" 
+    <div class="tree-node-content @(IsActive ? "active" : "")"
          @onclick="HandleClick"
          @onmouseenter="() => _isHovered = true"
          @onmouseleave="() => _isHovered = false">
-        
+
         @if (HasChildren)
         {
-            <button class="tree-toggle-btn @(_isExpanded ? "expanded" : "")" 
+            <button class="tree-toggle-btn @(_isExpanded ? "expanded" : "")"
                     type="button"
                     @onclick:stopPropagation="true"
                     @onclick="ToggleExpanded"
@@ -20,7 +20,7 @@
         {
             <span class="tree-toggle-spacer"></span>
         }
-        
+
         <div class="tree-item-icon">
             @if (HasChildren)
             {
@@ -31,10 +31,46 @@
                 <i class="bi bi-file-earmark text-primary"></i>
             }
         </div>
-        
+
         <div class="tree-item-details">
             <span class="tree-item-id badge bg-secondary">@Node.Id</span>
             <span class="tree-item-description">@Node.Description</span>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline">
+                @for (int i = 0; i < 3; i++)
+                {
+                    var stepIndex = i;
+                    var status = GetTaskStatus(stepIndex);
+                    var isCompleted = status?.Id == 2;
+                    var isInProgress = status?.Id == 1;
+                    var isNotStarted = status?.Id == 0;
+
+                    <div class="timeline-step @GetStepClass(status)"
+                         @onclick:stopPropagation="true"
+                         title="@GetStepTitle(stepIndex, status)">
+                        <div class="timeline-dot">
+                            @if (isCompleted)
+                            {
+                                <i class="bi bi-check-circle-fill"></i>
+                            }
+                            else if (isInProgress)
+                            {
+                                <i class="bi bi-play-circle-fill"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-circle"></i>
+                            }
+                        </div>
+                        @if (i < 2)
+                        {
+                            <div class="timeline-line @(isCompleted ? "completed" : "")"></div>
+                        }
+                    </div>
+                }
+            </div>
         </div>
     </div>
 
@@ -61,6 +97,35 @@
     private bool IsActive => _isHovered;
 
     private bool HasChildren => Node.Children.Length > 0;
+
+    private StepStatus? GetTaskStatus(int index)
+    {
+        if (Node.Values != null && index < Node.Values.Length)
+        {
+            return Node.Values[index].Status;
+        }
+        return null;
+    }
+
+    private string GetStepClass(StepStatus? status)
+    {
+        if (status == null) return "not-started";
+
+        return status.Id switch
+        {
+            0 => "not-started",
+            1 => "in-progress",
+            2 => "completed",
+            _ => "not-started"
+        };
+    }
+
+    private string GetStepTitle(int index, StepStatus? status)
+    {
+        var stepName = $"Étape {index + 1}";
+        var statusLabel = status?.Label ?? "Non commencé";
+        return $"{stepName}: {statusLabel}";
+    }
 
     private void ToggleExpanded()
     {

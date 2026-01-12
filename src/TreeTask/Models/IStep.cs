@@ -7,7 +7,7 @@
         string Label { get; }
         string Value { get; }
 
-        TaskStatus Status { get; }
+        StepStatus Status { get; }
 
     }
 }

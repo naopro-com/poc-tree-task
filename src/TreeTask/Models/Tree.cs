@@ -6,6 +6,6 @@
         public required string Id { get; set; }
         public required string Description { get; set; }
 
-        public TaskStatus[] Values { get; init; } = Array.Empty<TaskStatus>();
+        public IStep[] Values { get; init; } = Array.Empty<IStep>();
     }
 }
