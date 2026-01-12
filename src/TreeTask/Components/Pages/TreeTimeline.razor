@@ -1,16 +1,207 @@
 ﻿@page "/tree-timeline"
 @using TreeTask.Data
 @using TreeTask.Models
+@using System.Text.Json
 @rendermode InteractiveServer
+@inject IJSRuntime JS
 
 <PageTitle>Arborescence</PageTitle>
 
-<h1>Arborescence</h1>
-
-<div class="tree-container">
-    <TreeNode Node="_tree" />
+<div class="header-section">
+    <h1>Arborescence</h1>
+    
+    <div class="tree-selector">
+        <label for="treeSelect" class="selector-label">📂 Sélectionner une arborescence :</label>
+        <div class="selector-controls">
+            <select id="treeSelect" @bind="selectedStorageKey" class="tree-dropdown" disabled="@isLoading">
+                <option value="">-- Données d'exemple --</option>
+                @if (availableKeys != null)
+                {
+                    @foreach (var key in availableKeys)
+                    {
+                        <option value="@key">@key</option>
+                    }
+                }
+            </select>
+            <button class="btn-load" @onclick="LoadSelectedTree" disabled="@isLoading">
+                <span class="icon">🔄</span> Charger
+            </button>
+            <button class="btn-refresh" @onclick="RefreshStorageKeys" disabled="@isLoading" title="Rafraîchir la liste">
+                <span class="icon">🔃</span>
+            </button>
+        </div>
+        @if (!string.IsNullOrEmpty(currentLoadedKey))
+        {
+            <div class="current-tree-info">
+                <span class="info-badge">✓ Arborescence active : <strong>@currentLoadedKey</strong></span>
+            </div>
+        }
+    </div>
 </div>
 
+@if (isLoading)
+{
+    <div class="loading-container">
+        <p>⏳ Chargement des données...</p>
+    </div>
+}
+else if (errorMessage != null)
+{
+    <div class="error-container">
+        <p class="error-message">❌ @errorMessage</p>
+        <button class="btn-retry" @onclick="LoadSelectedTree">🔄 Réessayer</button>
+    </div>
+}
+else if (_tree != null)
+{
+    <div class="tree-container">
+        <TreeNode Node="_tree" />
+    </div>
+}
+
 @code {
-    private Tree _tree = SampleOrganizationData.GetSampleOrganization();
+    private Tree? _tree;
+    private bool isLoading = true;
+    private string? errorMessage;
+    private List<string>? availableKeys;
+    private string selectedStorageKey = "";
+    private string? currentLoadedKey;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await RefreshStorageKeys();
+            await LoadTreeData();
+        }
+    }
+
+    private async Task RefreshStorageKeys()
+    {
+        try
+        {
+            var keysJson = await JS.InvokeAsync<string>("getAllLocalStorageKeys");
+            var allKeys = JsonSerializer.Deserialize<List<string>>(keysJson) ?? new List<string>();
+            
+            // Filtrer pour ne garder que les clés qui semblent contenir des données Tree
+            availableKeys = new List<string>();
+            foreach (var key in allKeys)
+            {
+                try
+                {
+                    var data = await JS.InvokeAsync<string?>("localStorage.getItem", key);
+                    if (!string.IsNullOrEmpty(data))
+                    {
+                        // Essayer de parser pour vérifier si c'est un objet Tree valide
+                        var testTree = JsonSerializer.Deserialize<Tree>(data, GetJsonOptions());
+                        if (testTree != null && !string.IsNullOrEmpty(testTree.Id))
+                        {
+                            availableKeys.Add(key);
+                        }
+                    }
+                }
+                catch
+                {
+                    // Ignorer les clés qui ne sont pas des objets Tree valides
+                }
+            }
+            
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors du rafraîchissement des clés : {ex.Message}");
+        }
+    }
+
+    private async Task LoadSelectedTree()
+    {
+        await LoadTreeData();
+    }
+
+    private async Task LoadTreeData()
+    {
+        try
+        {
+            isLoading = true;
+            errorMessage = null;
+            StateHasChanged();
+
+            string? jsonData = null;
+
+            // Si une clé est sélectionnée, l'utiliser
+            if (!string.IsNullOrEmpty(selectedStorageKey))
+            {
+                jsonData = await JS.InvokeAsync<string?>("localStorage.getItem", selectedStorageKey);
+                
+                if (string.IsNullOrEmpty(jsonData))
+                {
+                    throw new Exception($"Aucune donnée trouvée pour la clé '{selectedStorageKey}'");
+                }
+                
+                currentLoadedKey = selectedStorageKey;
+            }
+            else
+            {
+                // Mode automatique : essayer modifiedData puis initData
+                jsonData = await JS.InvokeAsync<string?>("localStorage.getItem", "modifiedData");
+                
+                if (!string.IsNullOrEmpty(jsonData))
+                {
+                    currentLoadedKey = "modifiedData";
+                }
+                else
+                {
+                    jsonData = await JS.InvokeAsync<string?>("localStorage.getItem", "initData");
+                    
+                    if (!string.IsNullOrEmpty(jsonData))
+                    {
+                        currentLoadedKey = "initData";
+                    }
+                }
+            }
+
+            // Si toujours aucune donnée, utiliser les données d'exemple
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                _tree = SampleOrganizationData.GetSampleOrganization();
+                currentLoadedKey = "Données d'exemple";
+                errorMessage = "ℹ️ Aucune donnée dans localStorage. Données d'exemple chargées. Utilisez la page 'Gestion des Fichiers' pour importer vos données.";
+                return;
+            }
+
+            // Désérialiser les données
+            _tree = JsonSerializer.Deserialize<Tree>(jsonData, GetJsonOptions());
+
+            if (_tree == null)
+            {
+                throw new Exception("Impossible de désérialiser les données de l'arbre.");
+            }
+            
+            errorMessage = null;
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Erreur lors du chargement des données : {ex.Message}";
+            // Fallback sur les données d'exemple en cas d'erreur
+            _tree = SampleOrganizationData.GetSampleOrganization();
+            currentLoadedKey = "Données d'exemple (erreur)";
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private JsonSerializerOptions GetJsonOptions()
+    {
+        return new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
+    }
 }

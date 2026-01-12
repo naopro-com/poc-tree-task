@@ -1,0 +1,341 @@
+﻿@page "/file"
+@using TreeTask.Models
+@using System.Text.Json
+@using Microsoft.AspNetCore.Components.Forms
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<PageTitle>Gestion des Fichiers</PageTitle>
+
+<div class="file-container">
+    <h1>Gestion des Fichiers JSON</h1>
+    <p>Importez et exportez vos données d'arbre organisationnel entre votre ordinateur et le localStorage du navigateur.</p>
+
+    @if (!string.IsNullOrEmpty(statusMessage))
+    {
+        <div class="alert @(isError ? "alert-error" : "alert-success")">
+            @statusMessage
+        </div>
+    }
+
+    <div class="section-container">
+        <!-- Section Import depuis fichier local -->
+        <section class="file-section">
+            <h2>📁 Importer un fichier JSON local</h2>
+            <p>Sélectionnez un fichier JSON depuis votre ordinateur et importez-le dans le localStorage.</p>
+
+            <div class="form-group">
+                <label for="fileInput" class="form-label">Sélectionnez un fichier JSON :</label>
+                <InputFile id="fileInput" OnChange="HandleFileSelected" accept=".json" class="file-input" />
+            </div>
+
+            @if (selectedFileName != null)
+            {
+                <div class="file-info">
+                    <p>📄 Fichier sélectionné : <strong>@selectedFileName</strong></p>
+                    
+                    <div class="form-group">
+                        <label for="importKey" class="form-label">Clé localStorage :</label>
+                        <input id="importKey" type="text" @bind="importStorageKey" class="text-input" placeholder="Ex: myTreeData" />
+                    </div>
+
+                    <button class="btn btn-primary" @onclick="ImportFileToLocalStorage" disabled="@(string.IsNullOrWhiteSpace(importStorageKey))">
+                        <span class="icon">📥</span> Importer dans localStorage
+                    </button>
+                </div>
+            }
+
+            @if (importPreview != null)
+            {
+                <div class="preview">
+                    <h3>Aperçu des données importées :</h3>
+                    <div class="preview-info">
+                        <p><strong>Nœud racine :</strong> @importPreview.Id</p>
+                        <p><strong>Description :</strong> @importPreview.Description</p>
+                        <p><strong>Enfants :</strong> @importPreview.Children.Length nœud(s)</p>
+                    </div>
+                    <details>
+                        <summary>Voir le JSON complet</summary>
+                        <pre>@importedJsonPreview</pre>
+                    </details>
+                </div>
+            }
+        </section>
+
+        <!-- Section Export vers fichier -->
+        <section class="file-section">
+            <h2>💾 Exporter depuis localStorage vers fichier</h2>
+            <p>Exportez les données du localStorage vers un fichier JSON téléchargeable sur votre ordinateur.</p>
+
+            <div class="form-group">
+                <label for="exportKey" class="form-label">Clé localStorage à exporter :</label>
+                <input id="exportKey" type="text" @bind="exportStorageKey" class="text-input" placeholder="Ex: modifiedData" />
+            </div>
+
+            <div class="form-group">
+                <label for="exportFileName" class="form-label">Nom du fichier de sortie :</label>
+                <input id="exportFileName" type="text" @bind="exportFileName" class="text-input" placeholder="Ex: mon-arbre.json" />
+            </div>
+
+            <button class="btn btn-success" @onclick="ExportFromLocalStorageToFile" 
+                    disabled="@(string.IsNullOrWhiteSpace(exportStorageKey) || string.IsNullOrWhiteSpace(exportFileName))">
+                <span class="icon">💾</span> Télécharger le fichier
+            </button>
+        </section>
+
+        <!-- Section Gestion du localStorage -->
+        <section class="file-section">
+            <h2>🗂️ Gestion du localStorage</h2>
+            <p>Visualisez et gérez le contenu du localStorage.</p>
+
+            <div class="button-group">
+                <button class="btn btn-warning" @onclick="ListAllLocalStorageKeys">
+                    <span class="icon">📋</span> Lister toutes les clés
+                </button>
+            </div>
+
+            @if (localStorageKeys != null && localStorageKeys.Any())
+            {
+                <div class="preview">
+                    <h3>Clés présentes dans localStorage :</h3>
+                    <ul class="keys-list">
+                        @foreach (var key in localStorageKeys)
+                        {
+                            <li>
+                                <span class="key-name">🔑 @key</span>
+                                <button class="btn-small btn-view" @onclick="() => ViewStorageKey(key)">👁️ Voir</button>
+                                <button class="btn-small btn-delete" @onclick="() => DeleteStorageKey(key)">🗑️</button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+
+            @if (viewedKeyContent != null)
+            {
+                <div class="preview">
+                    <h3>Contenu de "@viewedKeyName" :</h3>
+                    <pre>@viewedKeyContent</pre>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+@code {
+    private string? statusMessage;
+    private bool isError;
+
+    // Import depuis fichier local
+    private string? selectedFileName;
+    private string? selectedFileContent;
+    private string importStorageKey = "";
+    private Tree? importPreview;
+    private string? importedJsonPreview;
+
+    // Export vers fichier
+    private string exportStorageKey = "modifiedData";
+    private string exportFileName = "export.json";
+
+    // Gestion localStorage
+    private List<string>? localStorageKeys;
+    private string? viewedKeyName;
+    private string? viewedKeyContent;
+
+    private JsonSerializerOptions GetJsonOptions(bool writeIndented = false)
+    {
+        return new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true,
+            WriteIndented = writeIndented,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase  // ✅ Pour correspondre à "children" en minuscule
+        };
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        try
+        {
+            statusMessage = null;
+            importPreview = null;
+            importedJsonPreview = null;
+
+            var file = e.File;
+            selectedFileName = file.Name;
+
+            // Suggérer une clé basée sur le nom du fichier
+            importStorageKey = Path.GetFileNameWithoutExtension(file.Name);
+
+            // Lire le contenu du fichier
+            using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024); // 10MB max
+            using var reader = new StreamReader(stream);
+            selectedFileContent = await reader.ReadToEndAsync();
+
+            // Valider et afficher un aperçu
+            var options = GetJsonOptions();
+
+            importPreview = JsonSerializer.Deserialize<Tree>(selectedFileContent, options);
+            
+            if (importPreview == null)
+            {
+                throw new Exception("Le fichier JSON n'est pas valide ou ne correspond pas à la structure Tree attendue.");
+            }
+            
+            importedJsonPreview = JsonSerializer.Serialize(importPreview, options);
+            
+            statusMessage = $"✅ Fichier '{file.Name}' chargé et validé avec succès";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur lors de la lecture du fichier : {ex.Message}";
+            isError = true;
+            selectedFileName = null;
+            selectedFileContent = null;
+            importPreview = null;
+        }
+    }
+
+    private async Task ImportFileToLocalStorage()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(selectedFileContent) || string.IsNullOrWhiteSpace(importStorageKey))
+            {
+                throw new Exception("Aucun fichier sélectionné ou clé localStorage manquante");
+            }
+            
+            // Sauvegarder dans localStorage
+            await JS.InvokeVoidAsync("localStorage.setItem", importStorageKey, selectedFileContent);
+            
+            statusMessage = $"✅ Données importées avec succès dans localStorage sous la clé '{importStorageKey}'";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur lors de l'import : {ex.Message}";
+            isError = true;
+        }
+    }
+
+    private async Task ExportFromLocalStorageToFile()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(exportStorageKey) || string.IsNullOrWhiteSpace(exportFileName))
+            {
+                throw new Exception("Clé localStorage ou nom de fichier manquant");
+            }
+            
+            // Récupérer depuis localStorage
+            var jsonData = await JS.InvokeAsync<string?>("localStorage.getItem", exportStorageKey);
+            
+            if (string.IsNullOrEmpty(jsonData))
+            {
+                throw new Exception($"Aucune donnée trouvée pour la clé '{exportStorageKey}' dans localStorage");
+            }
+            
+            // Valider les données
+            var tree = JsonSerializer.Deserialize<Tree>(jsonData);
+            if (tree == null)
+            {
+                throw new Exception("Les données ne sont pas valides");
+            }
+            
+            // Créer et télécharger le fichier
+            var fileName = exportFileName.EndsWith(".json") ? exportFileName : $"{exportFileName}.json";
+            var fileContent = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(jsonData));
+            
+            await JS.InvokeVoidAsync("downloadFile", fileName, fileContent);
+            
+            statusMessage = $"✅ Fichier '{fileName}' téléchargé avec succès";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur lors de l'export : {ex.Message}";
+            isError = true;
+        }
+    }
+
+    private async Task ListAllLocalStorageKeys()
+    {
+        try
+        {
+            statusMessage = null;
+            viewedKeyContent = null;
+            
+            var keysJson = await JS.InvokeAsync<string>("getAllLocalStorageKeys");
+            localStorageKeys = JsonSerializer.Deserialize<List<string>>(keysJson) ?? new List<string>();
+            
+            statusMessage = $"✅ {localStorageKeys.Count} clé(s) trouvée(s) dans localStorage";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur : {ex.Message}";
+            isError = true;
+        }
+    }
+
+    private async Task ViewStorageKey(string key)
+    {
+        try
+        {
+            statusMessage = null;
+            viewedKeyName = key;
+            
+            var content = await JS.InvokeAsync<string?>("localStorage.getItem", key);
+            
+            if (string.IsNullOrEmpty(content))
+            {
+                viewedKeyContent = "(vide)";
+            }
+            else
+            {
+                // Essayer de formater le JSON si possible
+                try
+                {
+                    var jsonObj = JsonSerializer.Deserialize<object>(content);
+                    viewedKeyContent = JsonSerializer.Serialize(jsonObj, new JsonSerializerOptions { WriteIndented = true });
+                }
+                catch
+                {
+                    viewedKeyContent = content;
+                }
+            }
+            
+            statusMessage = $"✅ Contenu de '{key}' affiché";
+            isError = false;
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur : {ex.Message}";
+            isError = true;
+        }
+    }
+
+    private async Task DeleteStorageKey(string key)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.removeItem", key);
+            
+            statusMessage = $"✅ Clé '{key}' supprimée avec succès";
+            isError = false;
+            
+            // Rafraîchir la liste
+            await ListAllLocalStorageKeys();
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"❌ Erreur lors de la suppression : {ex.Message}";
+            isError = true;
+        }
+    }
+}
+
+

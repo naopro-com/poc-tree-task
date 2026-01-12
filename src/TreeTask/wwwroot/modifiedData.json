@@ -1,0 +1,515 @@
+{
+  "id": "CEO-001",
+  "description": "Sophie Marchand - PDG - Direction Générale",
+  "Task1": 0,
+  "Task2": 1,
+  "children": [
+    {
+      "id": "CTO-001",
+      "description": "Marc Dubois - CTO - Technologies & Innovation",
+      "Task3": 2,
+      "children": [
+        {
+          "id": "LEAD-FRONT-001",
+          "description": "Amélie Laurent - Lead Frontend - React & Blazor",
+          "Task1": 1,
+          "Task2": 0,
+          "Task3": 2,
+          "children": [
+            {
+              "id": "DEV-FRONT-001",
+              "description": "Thomas Roux - Dev Frontend - UI/UX Components",
+              "Task2": 1,
+              "children": []
+            },
+            {
+              "id": "DEV-FRONT-002",
+              "description": "Julie Martin - Dev Frontend - Accessibilité & Performance",
+              "Task1": 2,
+              "Task3": 0,
+              "children": []
+            },
+            {
+              "id": "DEV-FRONT-003",
+              "description": "Maxime Dupont - Dev Frontend - State Management & Redux",
+              "children": []
+            },
+            {
+              "id": "DEV-FRONT-004",
+              "description": "Laura Fontaine - Dev Frontend - Testing & E2E",
+              "Task1": 0,
+              "Task2": 2,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LEAD-BACK-001",
+          "description": "Pierre Lefevre - Lead Backend - Architecture & APIs",
+          "Task1": 1,
+          "children": [
+            {
+              "id": "DEV-BACK-001",
+              "description": "Nicolas Petit - Dev Backend - .NET Core & Azure",
+              "Task1": 2,
+              "Task2": 1,
+              "Task3": 0,
+              "children": []
+            },
+            {
+              "id": "DEV-BACK-002",
+              "description": "Sarah Bernard - Dev Backend - Microservices & Databases",
+              "Task2": 0,
+              "children": []
+            },
+            {
+              "id": "DEV-BACK-003",
+              "description": "Vincent Lambert - Dev Backend - API Gateway & GraphQL",
+              "Task1": 1,
+              "Task2": 2,
+              "children": []
+            },
+            {
+              "id": "DEV-BACK-004",
+              "description": "Céline Roussel - Dev Backend - Event Sourcing & CQRS",
+              "children": []
+            },
+            {
+              "id": "DEV-BACK-005",
+              "description": "Julien Marchal - Dev Backend - Performance & Caching",
+              "Task3": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LEAD-DEVOPS-001",
+          "description": "Léa Moreau - Responsable DevOps - CI/CD & Cloud",
+          "Task1": 0,
+          "Task3": 2,
+          "children": [
+            {
+              "id": "ENG-DEVOPS-001",
+              "description": "Antoine Garnier - Ingénieur DevOps - Kubernetes & Terraform",
+              "Task2": 1,
+              "children": []
+            },
+            {
+              "id": "ENG-DEVOPS-002",
+              "description": "Émilie Perrin - Ingénieure DevOps - Monitoring & Observability",
+              "Task1": 2,
+              "Task2": 0,
+              "Task3": 1,
+              "children": []
+            },
+            {
+              "id": "ENG-DEVOPS-003",
+              "description": "Damien Mercier - Ingénieur DevOps - Security & Compliance",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LEAD-MOBILE-001",
+          "description": "Sophie Blanc - Lead Mobile - iOS & Android",
+          "Task1": 1,
+          "Task2": 1,
+          "children": [
+            {
+              "id": "DEV-MOBILE-001",
+              "description": "Kevin Dumas - Dev Mobile - Flutter & React Native",
+              "Task3": 2,
+              "children": []
+            },
+            {
+              "id": "DEV-MOBILE-002",
+              "description": "Marina Leroy - Dev Mobile - iOS Swift & SwiftUI",
+              "Task1": 0,
+              "children": []
+            },
+            {
+              "id": "DEV-MOBILE-003",
+              "description": "Fabrice Morel - Dev Mobile - Android Kotlin & Jetpack",
+              "Task1": 2,
+              "Task2": 1,
+              "Task3": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LEAD-DATA-001",
+          "description": "Philippe Girard - Lead Data - Data Engineering & Analytics",
+          "children": [
+            {
+              "id": "ENG-DATA-001",
+              "description": "Sylvie Thomas - Data Engineer - ETL & Data Pipeline",
+              "Task1": 1,
+              "Task3": 2,
+              "children": []
+            },
+            {
+              "id": "ENG-DATA-002",
+              "description": "Raphaël Bonnet - Data Engineer - Big Data & Spark",
+              "Task2": 0,
+              "children": []
+            },
+            {
+              "id": "ANALYST-001",
+              "description": "Caroline Duval - Data Analyst - BI & Reporting",
+              "Task1": 2,
+              "Task2": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LEAD-QA-001",
+          "description": "Isabelle Caron - Lead QA - Quality Assurance",
+          "Task2": 1,
+          "Task3": 0,
+          "children": [
+            {
+              "id": "QA-001",
+              "description": "Benjamin Roy - QA Engineer - Automated Testing",
+              "children": []
+            },
+            {
+              "id": "QA-002",
+              "description": "Audrey Vincent - QA Engineer - Manual Testing & Validation",
+              "Task1": 0,
+              "Task2": 2,
+              "Task3": 1,
+              "children": []
+            },
+            {
+              "id": "QA-003",
+              "description": "Stéphane Poirier - QA Engineer - Performance Testing",
+              "Task1": 1,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CFO-001",
+      "description": "Catherine Durand - Directrice Financière - Gestion & Contrôle",
+      "Task1": 2,
+      "Task2": 0,
+      "children": [
+        {
+          "id": "COMPTA-001",
+          "description": "François Simon - Responsable Comptabilité - Comptabilité Générale",
+          "Task3": 1,
+          "children": [
+            {
+              "id": "COMPTA-ASSIST-001",
+              "description": "Marie-Claude Faure - Assistante Comptable - Saisie & Rapprochement",
+              "Task1": 0,
+              "Task2": 2,
+              "children": []
+            },
+            {
+              "id": "COMPTA-ASSIST-002",
+              "description": "Jean-Marc Leblanc - Assistant Comptable - Factures & Paiements",
+              "Task2": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "CONTROLE-001",
+          "description": "Isabelle Michel - Contrôleuse de Gestion - Analyse & Reporting",
+          "Task1": 1,
+          "Task3": 0,
+          "children": [
+            {
+              "id": "CONTROLE-ASSIST-001",
+              "description": "Patrick Renard - Contrôleur de Gestion Junior - Budget & Prévisions",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "TRESORERIE-001",
+          "description": "Laurent Marchand - Responsable Trésorerie - Cash Management",
+          "Task1": 2,
+          "Task2": 1,
+          "Task3": 2,
+          "children": [
+            {
+              "id": "TRESORERIE-ASSIST-001",
+              "description": "Valérie Arnaud - Assistante Trésorerie - Flux & Placements",
+              "Task1": 0,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CMO-001",
+      "description": "Alexandre Blanc - Directeur Marketing - Stratégie & Communication",
+      "Task3": 2,
+      "children": [
+        {
+          "id": "PROD-001",
+          "description": "Emma Rousseau - Chef de Produit - Produits Digitaux",
+          "Task1": 1,
+          "Task2": 0,
+          "children": [
+            {
+              "id": "PO-001",
+              "description": "Hugo Lemoine - Product Owner - Features & Roadmap",
+              "Task2": 2,
+              "Task3": 1
+            },
+            {
+              "id": "PO-002",
+              "description": "Chloé Barbier - Product Owner - Mobile Apps",
+              "Task1": 0,
+              "Task3": 2,
+              "children": []
+            },
+            {
+              "id": "PM-001",
+              "description": "Mathieu Gauthier - Product Manager - SaaS Platform",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "COM-001",
+          "description": "Camille Girard - Resp. Communication - Communication Digitale",
+          "Task1": 2,
+          "children": [
+            {
+              "id": "COM-SOCIAL-001",
+              "description": "Lucie Bertrand - Community Manager - Réseaux Sociaux",
+              "Task1": 1,
+              "Task2": 0,
+              "children": []
+            },
+            {
+              "id": "COM-CONTENT-001",
+              "description": "David Collet - Content Manager - Rédaction & SEO",
+              "Task3": 2
+            }
+          ]
+        },
+        {
+          "id": "UX-001",
+          "description": "Lucas André - UX Designer - Expérience Utilisateur",
+          "children": [
+            {
+              "id": "UI-001",
+              "description": "Sophie Masson - UI Designer - Interface & Design System",
+              "Task1": 0,
+              "Task2": 1,
+              "Task3": 2,
+              "children": []
+            },
+            {
+              "id": "UX-RESEARCH-001",
+              "description": "Claire Moulin - UX Researcher - Tests Utilisateurs",
+              "Task2": 2,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "GROWTH-001",
+          "description": "Nicolas Dupuis - Resp. Growth - Acquisition & Rétention",
+          "Task1": 1,
+          "Task2": 2,
+          "children": [
+            {
+              "id": "GROWTH-ANALYST-001",
+              "description": "Amélie Vidal - Growth Analyst - Analytics & A/B Testing",
+              "Task3": 0,
+              "children": []
+            },
+            {
+              "id": "GROWTH-MANAGER-001",
+              "description": "Jérémie Roche - Growth Manager - Campagnes Marketing",
+              "Task1": 2,
+              "Task2": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "HR-001",
+      "description": "Nathalie Fontaine - DRH - Ressources Humaines & Talents",
+      "Task2": 0,
+      "children": [
+        {
+          "id": "RECRUTEMENT-001",
+          "description": "Olivier Chevalier - Resp. Recrutement - Acquisition de Talents",
+          "Task1": 1,
+          "Task3": 2,
+          "children": [
+            {
+              "id": "RECRUITER-001",
+              "description": "Jessica Renaud - Recruteuse - Profils Tech",
+              "children": []
+            },
+            {
+              "id": "RECRUITER-002",
+              "description": "Alexandre Picard - Recruteur - Profils Business",
+              "Task1": 0,
+              "Task2": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "FORMATION-001",
+          "description": "Marie Gauthier - Resp. Formation - Développement des Compétences",
+          "Task2": 2,
+          "children": [
+            {
+              "id": "TRAINER-001",
+              "description": "Sébastien Henry - Formateur - Compétences Techniques",
+              "Task1": 1,
+              "Task3": 0,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ADMIN-RH-001",
+          "description": "Christine Lemoine - Responsable Administration RH - Paie & Administration",
+          "children": [
+            {
+              "id": "ADMIN-RH-ASSIST-001",
+              "description": "Sandrine Bourgeois - Gestionnaire RH - Contrats & Dossiers",
+              "Task1": 2,
+              "Task2": 0,
+              "Task3": 1,
+              "children": []
+            },
+            {
+              "id": "ADMIN-RH-ASSIST-002",
+              "description": "Fabienne Gonzalez - Gestionnaire Paie - Salaires & Charges",
+              "Task2": 2,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "COO-001",
+      "description": "Jean-Pierre Roussel - Directeur des Opérations - Excellence Opérationnelle",
+      "Task1": 0,
+      "Task3": 1,
+      "children": [
+        {
+          "id": "OPS-001",
+          "description": "Éric Blanchard - Responsable Opérations - Processus & Qualité",
+          "Task2": 2,
+          "children": [
+            {
+              "id": "OPS-MANAGER-001",
+              "description": "Aurélie Gauthier - Operations Manager - Amélioration Continue",
+              "Task1": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "LOGISTIQUE-001",
+          "description": "Thierry Besson - Responsable Logistique - Supply Chain",
+          "Task1": 2,
+          "Task2": 0,
+          "Task3": 1,
+          "children": [
+            {
+              "id": "LOG-001",
+              "description": "Karine Leclerc - Coordinatrice Logistique - Approvisionnement",
+              "Task3": 2
+            }
+          ]
+        },
+        {
+          "id": "JURIDIQUE-001",
+          "description": "Martine Perrier - Responsable Juridique - Contrats & Conformité",
+          "children": [
+            {
+              "id": "LEGAL-001",
+              "description": "Guillaume Berger - Juriste - Droit Commercial",
+              "Task1": 0,
+              "Task2": 1,
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CSO-001",
+      "description": "Rachel Martin - Chief Sales Officer - Ventes & Partenariats",
+      "Task1": 1,
+      "children": [
+        {
+          "id": "SALES-FR-001",
+          "description": "Pierre Blanc - Responsable Ventes France - Marché Français",
+          "Task2": 0,
+          "Task3": 2,
+          "children": [
+            {
+              "id": "SALES-REP-001",
+              "description": "Antoine Moreau - Commercial Senior - Grands Comptes",
+              "Task1": 2,
+              "children": []
+            },
+            {
+              "id": "SALES-REP-002",
+              "description": "Caroline Dubois - Commerciale - PME & ETI",
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "SALES-INTL-001",
+          "description": "Michael Green - Responsable Ventes International - EMEA",
+          "Task1": 0,
+          "Task2": 1,
+          "children": [
+            {
+              "id": "SALES-INTL-REP-001",
+              "description": "Hannah Schmidt - Sales Manager - DACH Region",
+              "Task2": 2,
+              "Task3": 1,
+              "children": []
+            },
+            {
+              "id": "SALES-INTL-REP-002",
+              "description": "Marco Rossi - Sales Manager - Italie & Espagne",
+              "Task1": 1,
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "PARTNER-001",
+          "description": "Stéphanie Dupont - Responsable Partenariats - Channel & Alliances",
+          "Task3": 0,
+          "children": [
+            {
+              "id": "PARTNER-MANAGER-001",
+              "description": "François Laurent - Partner Manager - Intégrateurs",
+              "Task1": 2,
+              "Task2": 0,
+              "Task3": 1,
+              "children": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
