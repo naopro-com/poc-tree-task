@@ -1,0 +1,16 @@
+﻿@page "/tree-timeline"
+@using TreeTask.Data
+@using TreeTask.Models
+@rendermode InteractiveServer
+
+<PageTitle>Arborescence</PageTitle>
+
+<h1>Arborescence</h1>
+
+<div class="tree-container">
+    <TreeNode Node="_tree" />
+</div>
+
+@code {
+    private Tree _tree = SampleOrganizationData.GetSampleOrganization();
+}

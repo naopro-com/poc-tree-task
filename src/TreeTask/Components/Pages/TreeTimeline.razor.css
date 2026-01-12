@@ -1,0 +1,63 @@
+﻿.tree-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+}
+
+.tree-node {
+    margin-left: 20px;
+}
+
+.tree-node-header {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    margin: 4px 0;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+    .tree-node-header:hover {
+        background-color: #f0f0f0;
+    }
+
+.tree-toggle {
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    font-size: 14px;
+    user-select: none;
+}
+
+    .tree-toggle.empty {
+        visibility: hidden;
+    }
+
+.tree-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tree-id {
+    font-weight: 600;
+    color: #0066cc;
+    font-size: 0.9em;
+}
+
+.tree-description {
+    color: #333;
+}
+
+.tree-children {
+    margin-left: 0;
+    border-left: 2px solid #e0e0e0;
+    padding-left: 10px;
+}
+
+    .tree-children.collapsed {
+        display: none;
+    }

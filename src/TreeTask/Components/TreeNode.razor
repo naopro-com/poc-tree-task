@@ -1,0 +1,43 @@
+﻿@using TreeTask.Models
+
+<div class="tree-node">
+    <div class="tree-node-header" @onclick="ToggleExpanded">
+        <span class="tree-toggle @(HasChildren ? "" : "empty")">
+            @if (HasChildren)
+            {
+                @(_isExpanded ? "▼" : "▶")
+            }
+        </span>
+        <div class="tree-content">
+            <span class="tree-id">[@Node.Id]</span>
+            <span class="tree-description">@Node.Description</span>
+        </div>
+    </div>
+
+    @if (HasChildren && _isExpanded)
+    {
+        <div class="tree-children">
+            @foreach (var child in Node.Children)
+            {
+                <TreeNode Node="child" />
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required Tree Node { get; set; }
+
+    private bool _isExpanded = true;
+
+    private bool HasChildren => Node.Children.Length > 0;
+
+    private void ToggleExpanded()
+    {
+        if (HasChildren)
+        {
+            _isExpanded = !_isExpanded;
+        }
+    }
+}
