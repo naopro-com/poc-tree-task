@@ -1,22 +1,46 @@
 ﻿@using TreeTask.Models
 
-<div class="tree-node">
-    <div class="tree-node-header" @onclick="ToggleExpanded">
-        <span class="tree-toggle @(HasChildren ? "" : "empty")">
+<div class="tree-node @(IsRootNode ? "tree-root" : "")">
+    <div class="tree-node-content @(IsActive ? "active" : "")" 
+         @onclick="HandleClick"
+         @onmouseenter="() => _isHovered = true"
+         @onmouseleave="() => _isHovered = false">
+        
+        @if (HasChildren)
+        {
+            <button class="tree-toggle-btn @(_isExpanded ? "expanded" : "")" 
+                    type="button"
+                    @onclick:stopPropagation="true"
+                    @onclick="ToggleExpanded"
+                    aria-label="Toggle">
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        }
+        else
+        {
+            <span class="tree-toggle-spacer"></span>
+        }
+        
+        <div class="tree-item-icon">
             @if (HasChildren)
             {
-                @(_isExpanded ? "▼" : "▶")
+                <i class="bi bi-folder-fill text-warning"></i>
             }
-        </span>
-        <div class="tree-content">
-            <span class="tree-id">[@Node.Id]</span>
-            <span class="tree-description">@Node.Description</span>
+            else
+            {
+                <i class="bi bi-file-earmark text-primary"></i>
+            }
+        </div>
+        
+        <div class="tree-item-details">
+            <span class="tree-item-id badge bg-secondary">@Node.Id</span>
+            <span class="tree-item-description">@Node.Description</span>
         </div>
     </div>
 
     @if (HasChildren && _isExpanded)
     {
-        <div class="tree-children">
+        <div class="tree-children @(_isExpanded ? "show" : "")">
             @foreach (var child in Node.Children)
             {
                 <TreeNode Node="child" />
@@ -29,7 +53,12 @@
     [Parameter]
     public required Tree Node { get; set; }
 
+    [Parameter]
+    public bool IsRootNode { get; set; } = false;
+
     private bool _isExpanded = true;
+    private bool _isHovered = false;
+    private bool IsActive => _isHovered;
 
     private bool HasChildren => Node.Children.Length > 0;
 
@@ -39,5 +68,11 @@
         {
             _isExpanded = !_isExpanded;
         }
+    }
+
+    private void HandleClick()
+    {
+        // Logique pour sélectionner le nœud
+        Console.WriteLine($"Clicked on: {Node.Description}");
     }
 }
